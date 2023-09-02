@@ -5,6 +5,9 @@ use bevy::
     core_pipeline::clear_color::ClearColorConfig,
     window::WindowMode,
     asset::LoadState,
+    render::camera,
+    diagnostic::DiagnosticsStore,
+    diagnostic::FrameTimeDiagnosticsPlugin,
 };
 use once_cell::sync::*;
 use counted_array::*;
@@ -19,6 +22,7 @@ mod public;
 use public::*;
 
 mod load_assets;
+mod init_app;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -60,7 +64,8 @@ fn main()
     //メイン処理
     app
     .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
-    .add_plugins( load_assets::Schedule ) //assetsの事前読込処理
+    .add_plugins( load_assets::Schedule ) //assetsの事前ロード処理
+    .add_plugins( init_app::Schedule )    //ゲーム枠とFPSの表示
     ;
 
     //アプリの実行

@@ -84,14 +84,31 @@ pub const LIGHT3D_TRANSFORM: Transform = Transform::from_xyz( 30.0, 100.0, 40.0 
 ////////////////////////////////////////////////////////////////////////////////
 
 //assets（スプライト）
-pub const ASSETS_SPRITE_DEBUG_GRID: &str = "sprites/debug_grid.png";
+pub const ASSETS_SPRITE_DEBUG_GRID : &str = "sprites/debug_grid.png";
+pub const ASSETS_SPRITE_BRICK_WALL : &str = "sprites/brick_wall.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "sprites/kani_DOTOWN.png";
+
+//assets（フォント）
+pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "fonts/Orbitron-Black.ttf";
+pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "fonts/PressStart2P-Regular.ttf";
 
 //事前ロード対象
 counted_array!
 (   pub const PRELOAD_ASSETS: [ &str; _ ] =
     [   ASSETS_SPRITE_DEBUG_GRID,
+        ASSETS_SPRITE_BRICK_WALL,
+        ASSETS_SPRITE_KANI_DOTOWN,
+        ASSETS_FONT_ORBITRON_BLACK,
+        ASSETS_FONT_PRESSSTART2P_REGULAR,
     ]
 );
+
+////////////////////////////////////////////////////////////////////////////////
+
+//スプライト重なり
+pub const DEPTH_SPRITE_DEBUG_GRID : f32 = 999.0; //重なりの最大値
+pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0;
+pub const DEPTH_SPRITE_GAME_FRAME : f32 = 800.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 

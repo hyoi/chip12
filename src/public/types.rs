@@ -48,11 +48,16 @@ impl Orbit
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
 pub enum MyState
 {   #[default] LoadAssets,
+    InitApp,
 }
 
 //LoadAssetsの次のState登録用Resource
 #[derive( Resource )]
 pub struct AfterLoadAssets<T: States> { pub state: T }
+
+//InitAppの次のState登録用Resource
+#[derive( Resource )]
+pub struct AfterInitApp<T: States> { pub state: T }
 
 ////////////////////////////////////////////////////////////////////////////////
 
