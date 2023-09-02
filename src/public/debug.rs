@@ -7,7 +7,6 @@ use super::*;
 //スプライトの設定
 const COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 1.0, 1.0, 1.0, 0.01 );
 const DEPTH_SPRITE_DEBUG_GRID: f32 = 999.0; //重なりの最大値
-const ASSETS_SPRITE_DEBUG_GRID: &str = "sprites/debug_grid.png";
 
 //マス目状にスプライトを敷き詰める
 pub fn spawn_2d_sprites

@@ -83,4 +83,16 @@ pub const LIGHT3D_TRANSFORM: Transform = Transform::from_xyz( 30.0, 100.0, 40.0 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//assets（スプライト）
+pub const ASSETS_SPRITE_DEBUG_GRID: &str = "sprites/debug_grid.png";
+
+//事前ロード対象
+counted_array!
+(   pub const PRELOAD_ASSETS: [ &str; _ ] =
+    [   ASSETS_SPRITE_DEBUG_GRID,
+    ]
+);
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

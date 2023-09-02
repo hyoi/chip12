@@ -4,8 +4,11 @@ use bevy::
     log::LogPlugin,
     core_pipeline::clear_color::ClearColorConfig,
     window::WindowMode,
+    asset::LoadState,
 };
 use once_cell::sync::*;
+use counted_array::*;
+use rand::prelude::*;
 
 //standard library
 use std::ops::Range;
@@ -15,6 +18,7 @@ use std::f32::consts::PI;
 mod public;
 use public::*;
 
+mod load_assets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -51,7 +55,12 @@ fn main()
         (   bevy::window::close_on_esc, //[ESC]で終了
             misc::toggle_window_mode.run_if( not( misc::WASM ) ), //フルスクリーン切換
         )
-    )
+    );
+
+    //メイン処理
+    app
+    .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
+    .add_plugins( load_assets::Schedule ) //assetsの事前読込処理
     ;
 
     //アプリの実行

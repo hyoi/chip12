@@ -97,4 +97,14 @@ pub fn toggle_window_mode
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//QueryしたEnityを再帰的に削除する
+pub fn despawn<T: Component>
+(   q_entity: Query<Entity, With<T>>,
+    mut cmds: Commands,
+)
+{   q_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

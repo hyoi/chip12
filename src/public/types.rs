@@ -44,4 +44,16 @@ impl Orbit
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//ゲームの状態
+#[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
+pub enum MyState
+{   #[default] LoadAssets,
+}
+
+//LoadAssetsの次のState登録用Resource
+#[derive( Resource )]
+pub struct AfterLoadAssets<T: States> { pub state: T }
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
