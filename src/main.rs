@@ -2,8 +2,13 @@
 use bevy::
 {   prelude::*,
     log::LogPlugin,
+    core_pipeline::clear_color::ClearColorConfig,
 };
 use once_cell::sync::*;
+
+//standard library
+use std::ops::Range;
+use std::f32::consts::PI;
 
 //internal submodules
 mod public;
@@ -28,10 +33,15 @@ fn main()
         .set( ImagePlugin::default_nearest() ) //ピクセルパーフェクト
         .set( LogPlugin { filter: log_level.into(), ..default() } ) //ロギング
     )
-    // .add_systems( Startup, misc::spawn_2d_camera ) //2D camera
-    // .add_systems( Startup, misc::spawn_3d_camera ) //3D camera
-    // .add_systems( Startup, misc::spawn_3d_light )  //3D light
-    ;
+    .add_systems
+    (   Startup,
+        (   misc::spawn_2d_camera, //2D camera
+            misc::spawn_3d_camera, //3D camera
+            misc::spawn_3d_light,  //3D light
+            debug::spawn_2d_sprites.run_if( misc::DEBUG ), //2D表示テスト
+            debug::spawn_3d_objects.run_if( misc::DEBUG ), //3D表示テスト
+        )
+    );
 
     //アプリの実行
     app.run();
