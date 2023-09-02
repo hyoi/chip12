@@ -3,6 +3,7 @@ use bevy::
 {   prelude::*,
     log::LogPlugin,
     core_pipeline::clear_color::ClearColorConfig,
+    window::WindowMode,
 };
 use once_cell::sync::*;
 
@@ -42,6 +43,16 @@ fn main()
             debug::spawn_3d_objects.run_if( misc::DEBUG ), //3D表示テスト
         )
     );
+
+    //特別なキー入力処理
+    app
+    .add_systems
+    (   Update,
+        (   bevy::window::close_on_esc, //[ESC]で終了
+            misc::toggle_window_mode.run_if( not( misc::WASM ) ), //フルスクリーン切換
+        )
+    )
+    ;
 
     //アプリの実行
     app.run();

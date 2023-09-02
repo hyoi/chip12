@@ -4,6 +4,7 @@ use super::*;
 
 //.run_if( condition )用
 pub const DEBUG: fn() -> bool = || cfg!( debug_assertions );
+pub const WASM : fn() -> bool = || cfg!( target_arch = "wasm32" );
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +57,42 @@ pub fn spawn_3d_light( mut cmds: Commands )
     .insert( light )
     .insert( LIGHT3D_TRANSFORM.looking_at( Vec3::ZERO, Vec3::Y ) )
     ;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ウィンドウとフルスクリーンの切換(トグル動作)
+pub fn toggle_window_mode
+(   mut q_window: Query<&mut Window>,
+    keys: Res<Input<KeyCode>>,
+    gpdbtn: Res<Input<GamepadButton>>,
+    gamepads: Res<Gamepads>,
+)
+{   let Ok( mut window ) = q_window.get_single_mut() else { return };
+
+    //[Alt]＋[Enter]の状態
+    let is_key_pressed =
+        ( keys.pressed( KeyCode::AltRight ) || keys.pressed( KeyCode::AltLeft ) )
+            && keys.just_pressed( KeyCode::Return );
+
+    //ゲームパッドは抜き挿しでIDが変わるので.iter()で回す
+    let button_type = GamepadButtonType::Select; //ps4[SHARE]
+    let mut is_gpdbtn_pressed = false;
+    for gamepad in gamepads.iter()
+    {   if gpdbtn.just_pressed( GamepadButton { gamepad, button_type } )
+        {   is_gpdbtn_pressed = true;
+            break;
+        }
+    }
+
+    //入力がないなら
+    if ! is_key_pressed && ! is_gpdbtn_pressed { return }
+
+    //ウィンドウとフルスクリーンを切り替える
+    window.mode = match window.mode
+    {   WindowMode::Windowed => WindowMode::SizedFullscreen,
+        _                    => WindowMode::Windowed,
+    };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
