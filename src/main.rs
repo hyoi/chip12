@@ -24,6 +24,7 @@ use public::*;
 
 mod load_assets;
 mod init_app;
+mod play_game;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -73,8 +74,9 @@ fn main()
     //メイン処理
     app
     .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
-    .add_plugins( load_assets::Schedule ) //assetsの事前ロード処理
+    .add_plugins( load_assets::Schedule ) //assetsの事前ロード
     .add_plugins( init_app::Schedule )    //ゲーム枠とFPSの表示
+    .add_plugins( play_game::Schedule )   //ゲームロジック
     ;
 
     //アプリの実行
