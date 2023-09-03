@@ -209,9 +209,9 @@ pub fn catch_input_keyboard
 
     for keycode in inkey.get_pressed()
     {   match keycode
-        {   KeyCode::Z =>
+        {   KeyCode::X =>
                 orbit.r = ( orbit.r + time_delta ).min( ORBIT_CAMERA_MAX_R ),
-            KeyCode::X =>
+            KeyCode::Z =>
                 orbit.r = ( orbit.r - time_delta ).max( ORBIT_CAMERA_MIN_R ),
             KeyCode::Up =>
                 orbit.theta = ( orbit.theta + time_delta ).min( ORBIT_CAMERA_MAX_THETA ),
