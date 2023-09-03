@@ -56,8 +56,10 @@ fn main()
     )
     .add_systems
     (   Update,
-        (   bevy::window::close_on_esc, //[ESC]で終了
-            misc::toggle_window_mode.run_if( not( misc::WASM ) ), //フルスクリーン切換
+        (   (   bevy::window::close_on_esc, //[ESC]で終了
+                misc::toggle_window_mode,   //フルスクリーン切換
+            )
+            .run_if( not( misc::WASM ) ),
 
             (   (   misc::catch_input_keyboard, //極座標を更新(キー入力)
                     misc::catch_input_mouse,    //極座標を更新(マウス)
