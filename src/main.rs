@@ -8,6 +8,7 @@ use bevy::
     render::camera,
     diagnostic::DiagnosticsStore,
     diagnostic::FrameTimeDiagnosticsPlugin,
+    input::mouse,
 };
 use once_cell::sync::*;
 use counted_array::*;
@@ -15,7 +16,7 @@ use rand::prelude::*;
 
 //standard library
 use std::ops::Range;
-use std::f32::consts::PI;
+use std::f32::consts::{ PI, TAU };
 
 //internal submodules
 mod public;
@@ -34,13 +35,14 @@ fn main()
     //メインウィンドウの設定
     let primary_window = MAIN_WINDOW.clone();
     let log_level = if misc::DEBUG() { LOG_LEVEL_DEV } else { LOG_LEVEL_REL };
+    let filter = log_level.into();
     app
     .insert_resource( Msaa::Sample4 ) //アンチエイリアス
     .add_plugins
     (   DefaultPlugins
         .set( WindowPlugin { primary_window, ..default() } ) //メインウィンドウ
         .set( ImagePlugin::default_nearest() ) //ピクセルパーフェクト
-        .set( LogPlugin { filter: log_level.into(), ..default() } ) //ロギング
+        .set( LogPlugin { filter, ..default() } ) //ロギング
     )
     .add_systems
     (   Startup,
@@ -50,14 +52,21 @@ fn main()
             debug::spawn_2d_sprites.run_if( misc::DEBUG ), //2D表示テスト
             debug::spawn_3d_objects.run_if( misc::DEBUG ), //3D表示テスト
         )
-    );
-
-    //特別なキー入力処理
-    app
+    )
     .add_systems
     (   Update,
         (   bevy::window::close_on_esc, //[ESC]で終了
             misc::toggle_window_mode.run_if( not( misc::WASM ) ), //フルスクリーン切換
+
+            (   (   misc::catch_input_keyboard, //極座標を更新(キー入力)
+                    misc::catch_input_mouse,    //極座標を更新(マウス)
+                    misc::catch_input_gamepad,  //極座標を更新(ゲームパッド)
+                ),
+
+                #[cfg( debug_assertions )] //Updateで.run_ifよりover head少ない？
+                misc::move_orbit_camera::<misc::AppDefault3dCamera>, //Camera操作テスト
+            )
+            .chain() //実行順の固定
         )
     );
 

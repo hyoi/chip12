@@ -112,4 +112,21 @@ pub const DEPTH_SPRITE_GAME_FRAME : f32 = 800.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//極座標カメラの設定
+pub const ORBIT_CAMERA_INIT_R    : f32 = 5.0;      //初期値
+pub const ORBIT_CAMERA_INIT_THETA: f32 = PI * 0.6; //初期値(ラジアン) 1.0:天頂、0.5:真横、0.0:真下
+pub const ORBIT_CAMERA_INIT_PHI  : f32 = PI * 1.8; //初期値(ラジアン) 6時方向が0.0で反時計回り
+
+pub const ORBIT_CAMERA_MAX_R    : f32 = 10.0;      //rの最大値
+pub const ORBIT_CAMERA_MIN_R    : f32 = 1.0;       //rの最小値
+pub const ORBIT_CAMERA_MAX_THETA: f32 = PI * 0.99; //Θの最大値(ラジアン)
+pub const ORBIT_CAMERA_MIN_THETA: f32 = PI * 0.51; //Θの最小値(ラジアン)
+
+//極座標カメラ操作時のマウスの感度調整
+pub const MOUSE_WHEEL_Y_COEF : f32 = 0.1;
+pub const MOUSE_MOTION_Y_COEF: f32 = 0.01;
+pub const MOUSE_MOTION_X_COEF: f32 = 0.01;
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

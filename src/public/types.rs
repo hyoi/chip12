@@ -25,6 +25,7 @@ impl GridToPixel for IVec2
 ////////////////////////////////////////////////////////////////////////////////
 
 //極座標の型
+#[derive( Clone, Copy )]
 pub struct Orbit
 {   pub r    : f32, //極座標のr（注目点からカメラまでの距離）
     pub theta: f32, //極座標のΘ（注目点から見たカメラの垂直角度）
@@ -39,6 +40,26 @@ impl Orbit
         let z = self.r * self.theta.sin() * self.phi.cos();
 
         Vec3::new( x, y, z )
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//極座標カメラのResource
+#[derive( Resource, Clone, Copy )]
+pub struct OrbitCamera
+{   pub orbit: Orbit,
+}
+
+impl Default for OrbitCamera
+{   fn default() -> Self
+    {   Self
+        {   orbit: Orbit
+            {   r    : ORBIT_CAMERA_INIT_R,
+                theta: ORBIT_CAMERA_INIT_THETA,
+                phi  : ORBIT_CAMERA_INIT_PHI,
+            }
+        }
     }
 }
 
