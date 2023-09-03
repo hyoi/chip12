@@ -34,54 +34,6 @@ impl Plugin for Schedule
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//画面デザイン(枠)
-counted_array!
-(   const DESIGN_SCREEN_FRAME: [ &str; _ ] =
-    //   0123456789 123456789 123456789 123456789 123456789
-    [   "0123456789012345678901234567890123456789012", //0----
-        "1                              #0123456789#", //1
-        "2                              #0123456789#", //2
-        "3                              #0123456789#", //3
-        "4                              #0123456789#", //4
-        "5                              #0123456789#", //5
-        "6                              #0123456789#", //6
-        "7                              #0123456789#", //7
-        "8                              #0123456789#", //8
-        "9                              #0123456789#", //9
-        "0                              #0123456789#", //10---
-        "1                              #0123456789#", //11
-        "2                              #0123456789#", //12
-        "3                              #0123456789#", //13
-        "4                              #0123456789#", //14
-        "5                              #0123456789#", //15
-        "6                              #0123456789#", //16
-        "7                              #0123456789#", //17
-        "8                              #0123456789#", //18
-        "9                              #0123456789#", //19
-        "0                              #0123456789#", //20---
-        "1                              #0123456789#", //21
-        "2####5####0####5####0####5####0####5####0##", //22
-        "                                           ", //23
-    ]  //0123456789 123456789 123456789 123456789 123456789
-);
-
-//表示エリア(viewport)の設定
-const VIEWPORT_ADJUST: f32 = PIXELS_PER_GRID / 2.0;
-const VIEWPORT_LEFT  : f32 = PIXELS_PER_GRID        - VIEWPORT_ADJUST;
-const VIEWPORT_TOP   : f32 = PIXELS_PER_GRID        - VIEWPORT_ADJUST;
-const VIEWPORT_WIDTH : f32 = PIXELS_PER_GRID * 30.0 + PIXELS_PER_GRID;
-const VIEWPORT_HEIGHT: f32 = PIXELS_PER_GRID * 21.0 + PIXELS_PER_GRID;
-const VIEWPORT_ZERO  : Vec2 = Vec2::new( VIEWPORT_LEFT, VIEWPORT_TOP );
-const VIEWPORT_SIZE  : Vec2 = Vec2::new( VIEWPORT_WIDTH, VIEWPORT_HEIGHT );
-
-//おまけ(蟹)
-const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
-const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
-const MAGNIFY_SPRITE_KANI: f32 = 0.9;
-const COLOR_SPRITE_KANI: Color = Color::rgba( 1.0, 1.0, 1.0, 0.6 );
-
-////////////////////////////////////////////////////////////////////////////////
-
 //text UIのメッセージセクションの型
 type MessageSect<'a> =
 (   &'a str, //表示文字列
@@ -119,6 +71,12 @@ counted_array!
     ]
 );
 
+//おまけ(蟹)
+const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
+const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
+const MAGNIFY_SPRITE_KANI: f32 = 0.9;
+const COLOR_SPRITE_KANI: Color = Color::rgba( 1.0, 1.0, 1.0, 0.6 );
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの枠を表示する
@@ -130,9 +88,9 @@ fn spawn_screen_frame
     let alpha = if misc::DEBUG() { 0.5 } else { 1.0 };
     let color = Color::rgba( 1.0, 1.0, 1.0, alpha );
 
-    for ( y, line ) in DESIGN_SCREEN_FRAME.iter().enumerate()
+    for ( y, line ) in SCREEN_FRAME.design.iter().enumerate()
     {   for ( x, char ) in line.chars().enumerate()
-        {   if char == ' ' { continue }
+        {   if char != SCREEN_FRAME_WALL_CHAR { continue }
             let vec2 = IVec2::new( x as i32, y as i32 ).convert_pixel();
             let vec3 = vec2.extend( DEPTH_SPRITE_GAME_FRAME );
 
@@ -155,8 +113,8 @@ fn set_viewport
 
     camera.viewport = Some
     (   camera::Viewport
-        {   physical_position: VIEWPORT_ZERO.as_uvec2(),
-            physical_size    : VIEWPORT_SIZE.as_uvec2(),
+        {   physical_position: SCREEN_FRAME.zero.as_uvec2(),
+            physical_size    : SCREEN_FRAME.size.as_uvec2(),
             ..default()
         }
     );

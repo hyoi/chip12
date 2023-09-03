@@ -10,8 +10,8 @@ use bevy::
     diagnostic::FrameTimeDiagnosticsPlugin,
     input::mouse,
 };
-use once_cell::sync::*;
-use counted_array::*;
+use once_cell::sync::Lazy;
+use counted_array::counted_array;
 use rand::prelude::*;
 
 //standard library
