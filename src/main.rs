@@ -15,7 +15,7 @@ use counted_array::counted_array;
 use rand::prelude::*;
 
 //standard library
-use std::ops::Range;
+use std::ops::{ Range, Add };
 use std::f32::consts::{ PI, TAU };
 
 //internal submodules
