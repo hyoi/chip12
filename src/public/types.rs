@@ -70,6 +70,7 @@ impl Default for OrbitCamera
 pub enum MyState
 {   #[default] LoadAssets,
     InitApp,
+    GameStart,
 }
 
 //LoadAssetsの次のState登録用Resource
