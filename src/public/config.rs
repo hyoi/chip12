@@ -171,4 +171,23 @@ pub static SCREEN_FRAME: Lazy<ScreenFrame> = Lazy::new
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//マップ縦横幅(Grid)
+pub const MAP_GRIDS_WIDTH : i32 = 100;
+pub const MAP_GRIDS_HEIGHT: i32 = 100;
+
+//マップのレンジ（外壁含む）
+pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
+pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
+
+//外壁を含まないレンジ
+pub const MAP_GRIDS_X_RANGE_INNER: Range<i32> = 1..MAP_GRIDS_WIDTH  - 1;
+pub const MAP_GRIDS_Y_RANGE_INNER: Range<i32> = 1..MAP_GRIDS_HEIGHT - 1;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//四方の配列
+pub const NEWS: [ News; 4 ] = [ News::South, News::East, News::West, News::North ];
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
