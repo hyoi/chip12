@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//mapのResource
+//MapのResource
 #[derive( Resource )]
 pub struct Map
 {   rng   : rand::prelude::StdRng, //専用乱数発生器
@@ -14,6 +14,7 @@ pub struct Map
 #[derive( Clone )]
 struct Flag ( u128 );
 
+//Map::default()の定義
 impl Default for Map
 {   fn default() -> Self
     {   let seed_dev = 1234567890;
@@ -32,7 +33,7 @@ impl Default for Map
     }
 }
 
-//マス目の状態を表すビット
+//マス目の状態を表すビット(フラグは128個まで)
 const BIT_CELL_UNDEF  : u128 = 0b000; //未定義
 const BIT_CELL_SPACE  : u128 = 0b001; //地形：空地
 const BIT_CELL_WALL   : u128 = 0b010; //地形：壁
@@ -40,43 +41,40 @@ const BIT_FLAG_DEADEND: u128 = 0b100; //フラグ：行き止り
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Mapのメソッド群
+//Mapのメソッド
 impl Map
 {   //ユーティリティ
     fn is_inside( &self, cell: IVec2 ) -> bool
     {   MAP_GRIDS_X_RANGE.contains( &cell.x ) &&
         MAP_GRIDS_Y_RANGE.contains( &cell.y )
     }
-    fn matrix_mut( &mut self, cell: IVec2 ) -> &mut Flag
-    {   let IVec2 { x, y } = cell;
-        &mut self.matrix[ x as usize ][ y as usize ]
+    fn matrix_mut( &mut self, IVec2 { x, y }: IVec2 ) -> &mut Flag
+    {   &mut self.matrix[ x as usize ][ y as usize ]
     }
-    fn matrix( &self, cell: IVec2 ) -> &Flag
-    {   let IVec2 { x, y } = cell;
-        &self.matrix[ x as usize ][ y as usize ]
+    fn matrix( &self, IVec2 { x, y }: IVec2 ) -> &Flag
+    {   &self.matrix[ x as usize ][ y as usize ]
     }
 
     //全体を埋める
     fn fill_walls( &mut self )
     {   self.matrix.iter_mut().for_each
-        (   |column|
-            column.fill( Flag ( BIT_CELL_WALL ) )
+        (   |column| column.fill( Flag ( BIT_CELL_WALL ) )
         );
     }
 
-    //指定の位置を書き換える
+    //指定の位置の地形を書き換える（フラグはクリアされる）
     fn set_space( &mut self, cell: IVec2 )
     {   if ! self.is_inside( cell ) { return }
         *self.matrix_mut( cell ) = Flag ( BIT_CELL_SPACE );
     }
 
-    //指定の位置にフラグを付加する
+    //指定の位置の地形にフラグを付加する
     fn add_flag_deadend( &mut self, cell: IVec2 )
     {   if ! self.is_inside( cell ) { return }
         self.matrix_mut( cell ).0 |= BIT_FLAG_DEADEND;
     }
 
-    //指定の位置を判定する
+    //指定の位置の地形・フラグを判定する
     fn is_wall( &self, cell: IVec2 ) -> bool
     {   if ! self.is_inside( cell ) { return true } //範囲外は壁にする
         self.matrix( cell ).0 & BIT_CELL_WALL != 0
@@ -89,7 +87,6 @@ impl Map
     {   if ! self.is_inside( cell ) { return false } //範囲外に空地はない(＝行き止りもない)
         self.matrix( cell ).0 & BIT_FLAG_DEADEND != 0
     }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,10 +196,75 @@ pub fn make_new_data
     // map.examine_structure(); //広間と通路を識別して袋小路に目印を付ける
 }
 
-//Mapを3D表示する
+////////////////////////////////////////////////////////////////////////////////
+
+//Mapの全Entityの親になるEntityに印をつけるComponent
+#[derive( Component )]
+pub struct MapZeroEntity;
+
+//mapオブジェクト関係
+const WALL_CUBE_OBJ3D_SIZE      : f32 = 1.0; //拡大率
+const WALL_CUBE_OBJ3D_COLOR     : Color = Color::BISQUE;
+const WALL_CUBE_OBJ3D_COLOR_ZERO: Color = Color::RED; //debug時の原点Cubeの色
+const GROUND_PLANE_OBJ3D_COLOR  : Color = Color::MAROON;
+
+//迷路の3Dオブジェクトをspawnする
 pub fn spawn_entity
-()
-{}
+(   q_entity: Query<Entity, With<MapZeroEntity>>,
+    map: Res<Map>,
+    mut cmds: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+)
+{   //既存のEntityがあれば削除する
+    q_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
+
+    //壁のサイズ、原点の壁のテクスチャ、他の壁のテクスチャ、地面のテクスチャ
+    let size = WALL_CUBE_OBJ3D_SIZE * 0.9;
+    let texture_wall_zero   = WALL_CUBE_OBJ3D_COLOR_ZERO.into();
+    let texture_wall_normal: StandardMaterial = WALL_CUBE_OBJ3D_COLOR.into();
+    let texture_ground = GROUND_PLANE_OBJ3D_COLOR.into();
+
+    //迷路をspawnする
+    cmds.spawn( ( PbrBundle::default(), MapZeroEntity ) ) //Cube(親)
+    .insert( meshes.add( shape::Cube::new( size ).into() ) )
+    .insert( Transform::from_translation( Vec3::ZERO ) ) //原点
+    .insert( materials.add( texture_wall_zero ) )
+    .with_children
+    (   | cmds |
+        {   //子は、親からの相対位置にspawnされる(XZ平面)
+            for x in MAP_GRIDS_X_RANGE
+            {    for y in MAP_GRIDS_Y_RANGE
+                {   //原点は親なのでスキップ
+                    if x == 0 && y == 0 { continue }
+
+                    //3D空間での座標
+                    let grid = IVec2::new( x, y );
+                    let vec3 = grid.convert_3d_space();
+
+                    //壁
+                    if map.is_wall( grid )
+                    {   cmds.spawn( PbrBundle::default() )
+                        .insert( meshes.add( shape::Cube::new( size ).into() ) )
+                        .insert( Transform::from_translation( vec3 ) )
+                        .insert( materials.add( texture_wall_normal.clone() ) )
+                        ;
+                    }
+                }
+            }
+
+            //地面(子)も相対位置でspawnする
+            let long_side = MAP_GRIDS_WIDTH.max( MAP_GRIDS_HEIGHT ) as f32;
+            let half = long_side / 2.0;
+            let position = Vec3::new( half, 0.0, half ) - Vec3::ONE / 2.0;
+            cmds.spawn( PbrBundle::default() )
+            .insert( meshes.add( shape::Plane::from_size( long_side ).into() ) )
+            .insert( Transform::from_translation( position ) )
+            .insert( materials.add( texture_ground ) )
+            ;
+        }
+    );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

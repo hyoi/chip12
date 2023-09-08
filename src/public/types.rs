@@ -5,6 +5,7 @@ use super::*;
 //glamの型にメソッドを追加する準備
 pub trait GridToPixel
 {   fn convert_pixel( &self ) -> Vec2;
+    fn convert_3d_space( &self ) -> Vec3;
 }
 
 //glamの型にメソッドを追加する
@@ -20,6 +21,15 @@ impl GridToPixel for IVec2
 
         Vec2::new( x, y )
     }
+
+    //Grid座標(IVec2)から3D空間座標(Vec3)を算出する
+    fn convert_3d_space( &self ) -> Vec3
+    {   let x = self.x as f32;
+        let y = 0.0; //xz平面上
+        let z = self.y as f32;
+        Vec3::new( x, y, z )
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
