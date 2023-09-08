@@ -92,4 +92,24 @@ pub struct ScreenFrame<'a>
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//四方を表す列挙型
+#[derive( Default, Clone, Copy )]
+pub enum News { #[default] North, East, West, South }
+
+//IVec2 = IVec2 + News
+impl Add<News> for IVec2
+{   type Output = IVec2;
+    fn add( mut self, news: News ) -> IVec2
+    {   match news
+        {   News::North => { self.y -= 1; }
+            News::East  => { self.x += 1; }
+            News::West  => { self.x -= 1; }
+            News::South => { self.y += 1; }
+        }
+        self
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
