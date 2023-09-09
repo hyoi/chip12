@@ -93,7 +93,8 @@ impl Map
 
 //Mapのメソッド（迷路作成）
 impl Map
-{   fn build_labyrinth( &mut self )
+{   //迷路作成メソッド
+    fn build_labyrinth( &mut self )
     {   //穴を掘る準備
         let mut cell = self.start;
         let mut digable_walls = Vec::new();
@@ -101,11 +102,11 @@ impl Map
 
         //穴掘りループ
         loop
-        {   //四方の判定の初期化
+        {   //四方の判定準備
             digable_walls.clear();
-            backtrack = IVec2::default();
+            backtrack = IVec2::NEG_ONE;
 
-            //四方にある掘れる壁と戻り路を記録する
+            //四方の掘れる壁と戻り道を記録する
             for news in NEWS
             {   let next = cell + news;
 
@@ -115,10 +116,11 @@ impl Map
 
                 //四方のグリッドを調べる
                 if self.is_wall( next ) && self.is_digable( next, news )
-                {   digable_walls.push( next );
+                {   //壁であり且つ掘れるなら
+                    digable_walls.push( next );
                 }
                 else if self.is_space( next ) && ! self.is_deadend( next )
-                {   //道であり、且つ行止りのマーキングがないなら
+                {   //道であり且つ行止りのマーキングがないなら
                     backtrack = next;
                 }
             }
@@ -129,58 +131,55 @@ impl Map
                 self.set_space( cell );
             }
             else
-            {   //掘れる壁が見つからず、戻り路も見つからないなら迷路完成
-                if backtrack == IVec2::default() { break } //ループ脱出
+            {   //掘れる壁が見つからず、戻り道も見つからないなら迷路完成
+                if backtrack == IVec2::NEG_ONE { break }
 
-                //現在位置に行き止まりをマークし、後戻りする
+                //現在位置に行き止まりをマークし、戻り路へ進む(後戻りする)
                 self.add_flag_deadend( cell );
                 cell = backtrack;
             }
         }
-
-        //他の迷路作成関数を流用して道幅拡張工事をする
-        // self.make_type_labyrinth();
     }
 
     //壁が掘れるか調べる
-    fn is_digable( &self, cell: IVec2, sides: News ) -> bool
-    {   match sides
-        {   News::North =>
-                if self.is_wall( cell + News::North + News::West )
-                && self.is_wall( cell + News::North              ) // 壁壁壁
-                && self.is_wall( cell + News::North + News::East ) // 壁？壁
-                && self.is_wall( cell + News::West               ) // 　◎
-                && self.is_wall( cell + News::East               ) { return true },
-            News::West =>
-                if self.is_wall( cell + News::North + News::West )
-                && self.is_wall( cell + News::North              ) // 壁壁
-                && self.is_wall( cell + News::West               ) // 壁？◎
-                && self.is_wall( cell + News::South + News::West ) // 壁壁
-                && self.is_wall( cell + News::South              ) { return true },
-            News::East =>
-                if self.is_wall( cell + News::North              )
-                && self.is_wall( cell + News::North + News::East ) // 　壁壁
-                && self.is_wall( cell + News::East               ) // ◎？壁
-                && self.is_wall( cell + News::South              ) // 　壁壁
-                && self.is_wall( cell + News::South + News::East ) { return true },
-            News::South =>
-                if self.is_wall( cell + News::West               )
-                && self.is_wall( cell + News::East               ) // 　◎
-                && self.is_wall( cell + News::South + News::West ) // 壁？壁
-                && self.is_wall( cell + News::South              ) // 壁壁壁
-                && self.is_wall( cell + News::South + News::East ) { return true },
-        };
-
-        false //掘れない
+    fn is_digable( &self, cell: IVec2, news: News ) -> bool
+    {    match news
+        {   News::North
+            if self.is_wall( cell + News::North + News::West )
+            && self.is_wall( cell + News::North              ) // 壁壁壁
+            && self.is_wall( cell + News::North + News::East ) // 壁？壁
+            && self.is_wall( cell + News::West               )
+                => true,
+            News::West
+            if self.is_wall( cell + News::North + News::West )
+            && self.is_wall( cell + News::North              ) // 壁壁
+            && self.is_wall( cell + News::West               ) // 壁？◎
+            && self.is_wall( cell + News::South + News::West ) // 壁壁
+            && self.is_wall( cell + News::South              )
+                => true,
+            News::East
+            if self.is_wall( cell + News::North              )
+            && self.is_wall( cell + News::North + News::East ) // 　壁壁
+            && self.is_wall( cell + News::East               ) // ◎？壁
+            && self.is_wall( cell + News::South              ) // 　壁壁
+            && self.is_wall( cell + News::South + News::East )
+                => true,
+            News::South
+            if self.is_wall( cell + News::West               )
+            && self.is_wall( cell + News::East               ) // 　◎
+            && self.is_wall( cell + News::South + News::West ) // 壁？壁
+            && self.is_wall( cell + News::South              ) // 壁壁壁
+            && self.is_wall( cell + News::South + News::East )
+                => true,
+            _   => false,
+        }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //新しいMapデータを作る
-pub fn make_new_data
-(   mut map: ResMut<Map>,
-)
+pub fn make_new_data( mut map: ResMut<Map> )
 {   //初期化する
     map.fill_walls();
 
@@ -189,11 +188,8 @@ pub fn make_new_data
     let start = map.start;
     map.set_space( start );
 
-    //迷路を掘る
+    //迷路を作る
     map.build_labyrinth();
-
-    //迷路の構造解析
-    // map.examine_structure(); //広間と通路を識別して袋小路に目印を付ける
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,10 +231,10 @@ pub fn init_orbit_camera<T: Component>
 pub struct MapZeroEntity;
 
 //mapオブジェクト関係
-const WALL_CUBE_OBJ3D_SIZE      : f32 = 1.0; //拡大率
-const WALL_CUBE_OBJ3D_COLOR     : Color = Color::BISQUE;
-const WALL_CUBE_OBJ3D_COLOR_ZERO: Color = Color::RED; //debug時の原点Cubeの色
-const GROUND_PLANE_OBJ3D_COLOR  : Color = Color::MAROON;
+const WALL_CUBE_OBJ3D_SIZE      : f32 = 0.9; //拡大率
+const WALL_CUBE_OBJ3D_COLOR     : Color = Color::BISQUE; //通常Cubeの色
+const WALL_CUBE_OBJ3D_COLOR_ZERO: Color = Color::RED;    //原点Cubeの色
+const GROUND_PLANE_OBJ3D_COLOR  : Color = Color::MAROON; //地面の色
 
 //迷路の3Dオブジェクトをspawnする
 pub fn spawn_entity
@@ -252,8 +248,8 @@ pub fn spawn_entity
     q_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //壁のサイズ、原点の壁のテクスチャ、他の壁のテクスチャ、地面のテクスチャ
-    let size = WALL_CUBE_OBJ3D_SIZE * 0.9;
-    let texture_wall_zero   = WALL_CUBE_OBJ3D_COLOR_ZERO.into();
+    let size = WALL_CUBE_OBJ3D_SIZE;
+    let texture_wall_zero = WALL_CUBE_OBJ3D_COLOR_ZERO.into();
     let texture_wall_normal: StandardMaterial = WALL_CUBE_OBJ3D_COLOR.into();
     let texture_ground = GROUND_PLANE_OBJ3D_COLOR.into();
 
@@ -270,7 +266,7 @@ pub fn spawn_entity
                 {   //原点は親なのでスキップ
                     if x == 0 && y == 0 { continue }
 
-                    //3D空間での座標
+                    //3D空間の座標
                     let grid = IVec2::new( x, y );
                     let vec3 = grid.to_3dxz();
 
@@ -285,7 +281,7 @@ pub fn spawn_entity
                 }
             }
 
-            //地面(子)も相対位置でspawnする
+            //地面も相対位置でspawnする
             let long_side = MAP_GRIDS_WIDTH.max( MAP_GRIDS_HEIGHT ) as f32;
             let half = long_side / 2.0;
             let position = Vec3::new( half, 0.0, half ) - Vec3::ONE / 2.0;
@@ -299,6 +295,5 @@ pub fn spawn_entity
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 //End of code.
