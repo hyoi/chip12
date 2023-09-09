@@ -249,9 +249,9 @@ pub fn move_orbit_camera<T: Component>
     };
 
     //カメラの位置と向きを更新する
-    let vec3 = camera.orbit.convert_vec3();
-    let viewpoint = camera.look_at;
-    *transform = Transform::from_translation( vec3 ).looking_at( viewpoint, Vec3::Y );
+    let origin = camera.look_at;
+    let vec3 = camera.orbit.convert_vec3() + origin;
+    *transform = Transform::from_translation( vec3 ).looking_at( origin, Vec3::Y );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
