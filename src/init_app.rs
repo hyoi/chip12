@@ -91,7 +91,7 @@ fn spawn_screen_frame
     for ( y, line ) in SCREEN_FRAME.design.iter().enumerate()
     {   for ( x, char ) in line.chars().enumerate()
         {   if char != SCREEN_FRAME_WALL_CHAR { continue }
-            let vec2 = IVec2::new( x as i32, y as i32 ).convert_pixel();
+            let vec2 = IVec2::new( x as i32, y as i32 ).to_screen_pixel();
             let vec3 = vec2.extend( DEPTH_SPRITE_GAME_FRAME );
 
             cmds.spawn( SpriteBundle::default() )
@@ -160,7 +160,7 @@ fn spawn_footer
     //おまけ(蟹)
     let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_KANI );
     let color = COLOR_SPRITE_KANI;
-    let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).convert_pixel();
+    let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).to_screen_pixel();
     let vec3 = vec2.extend( DEPTH_SPRITE_KANI_DOTOWN );
 
     cmds

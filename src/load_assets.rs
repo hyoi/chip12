@@ -139,7 +139,7 @@ fn spawn_sprite( mut cmds: Commands )
             //スプライトの初期座標を乱数で決める
             let rnd_x = rng.gen_range( SCREEN_GRIDS_X_RANGE );
             let rnd_y = rng.gen_range( SCREEN_GRIDS_Y_RANGE );
-            let start = IVec2::new( rnd_x, rnd_y ).convert_pixel();
+            let start = IVec2::new( rnd_x, rnd_y ).to_screen_pixel();
             let px3d  = start.extend( DEPTH_SPRITE_TILE );
 
             //スプライトの移動先座標(ゴール)
@@ -171,7 +171,7 @@ fn move_sprite
     q_transform.for_each_mut
     (   | ( mut transform, goal ) |
         {   //座標の調整
-            let mut px2d = goal.grid.convert_pixel();
+            let mut px2d = goal.grid.to_screen_pixel();
             px2d.x = ( px2d.x + half_screen_w ) * scale - adjust_x;
             px2d.y = ( px2d.y - half_screen_h ) * scale + adjust_y;
 

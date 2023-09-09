@@ -4,14 +4,14 @@ use super::*;
 
 //glamの型にメソッドを追加する準備
 pub trait GridToPixel
-{   fn convert_pixel( &self ) -> Vec2;
-    fn convert_3d_space( &self ) -> Vec3;
+{   fn to_screen_pixel( &self ) -> Vec2;
+    fn to_3dxz( &self ) -> Vec3;
 }
 
 //glamの型にメソッドを追加する
 impl GridToPixel for IVec2
-{   //Grid座標(IVec2)からスクリーン座標(Vec2)を算出する
-    fn convert_pixel( &self ) -> Vec2
+{   //平面座標(IVec2)からスクリーン用の座標(Vec2)を算出する
+    fn to_screen_pixel( &self ) -> Vec2
     {   let neg_half_w = SCREEN_PIXELS_WIDTH  / -2.0;
         let half_h     = SCREEN_PIXELS_HEIGHT /  2.0;
         let half_grid  = PIXELS_PER_GRID      /  2.0;
@@ -22,8 +22,8 @@ impl GridToPixel for IVec2
         Vec2::new( x, y )
     }
 
-    //Grid座標(IVec2)から3D空間座標(Vec3)を算出する
-    fn convert_3d_space( &self ) -> Vec3
+    //平面座標(IVec2)から3D直交座標(Vec3)へ変換する
+    fn to_3dxz( &self ) -> Vec3
     {   let x = self.x as f32;
         let y = 0.0; //xz平面上
         let z = self.y as f32;
@@ -44,7 +44,7 @@ pub struct Orbit
 
 impl Orbit
 {   //極座標から直交座標へ変換する
-    pub fn convert_pixel( &self ) -> Vec3
+    pub fn convert_vec3( &self ) -> Vec3
     {   let x = self.r * self.theta.sin() * self.phi.sin();
         let y = self.r * self.theta.cos() * -1.0;
         let z = self.r * self.theta.sin() * self.phi.cos();

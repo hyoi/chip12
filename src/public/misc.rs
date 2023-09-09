@@ -40,7 +40,7 @@ pub fn spawn_3d_camera( mut cmds: Commands )
                 theta: ORBIT_CAMERA_INIT_THETA,
                 phi  : ORBIT_CAMERA_INIT_PHI,
             }
-            .convert_pixel()
+            .convert_vec3()
         )
         .looking_at( Vec3::ZERO, Vec3::Y )
     );
@@ -249,7 +249,7 @@ pub fn move_orbit_camera<T: Component>
     };
 
     //カメラの位置と向きを更新する
-    let vec3 = orbit.convert_pixel();
+    let vec3 = orbit.convert_vec3();
     *transform = Transform::from_translation( vec3 ).looking_at( Vec3::ZERO, Vec3::Y );
 }
 
