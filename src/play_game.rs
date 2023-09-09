@@ -19,6 +19,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::GameStart ),
             (   map::make_new_data, //新しいMapデータを作る
+                map::init_orbit_camera::<misc::AppDefault3dCamera>, //カメラを初期化
                 map::spawn_entity,  //Mapを3D表示する
             )
             .chain()

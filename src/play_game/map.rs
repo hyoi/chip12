@@ -198,6 +198,38 @@ pub fn make_new_data
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//カメラを初期化する
+//＜副作用＞ Res<OrbitCamera>が見つからない場合、Resouceを作成する
+pub fn init_orbit_camera<T: Component>
+(   mut q_camera: Query<&mut Transform, With<T>>,
+    o_camera: Option<ResMut<OrbitCamera>>,
+    map: Res<Map>,
+    mut cmds: Commands,
+)
+{   let Ok ( mut transform ) = q_camera.get_single_mut() else { return };
+
+    //初期値を準備する
+    let camera = OrbitCamera
+    {   look_at: map.start.to_3dxz(),
+        ..default()
+    };
+
+    //カメラのResourceの有無で処理を分ける
+    if let Some ( mut res_camera ) = o_camera
+    {   *res_camera = camera; //Resourceを書き換える
+    }
+    else
+    {   cmds.insert_resource( camera ); //Resourceを登録する
+    }
+
+    //カメラの位置と向きを更新する
+    let origin = camera.look_at;
+    let vec3 = camera.orbit.convert_vec3() + origin;
+    *transform = Transform::from_translation( vec3 ).looking_at( origin, Vec3::Y );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //Mapの全Entityの親になるEntityに印をつけるComponent
 #[derive( Component )]
 pub struct MapZeroEntity;
@@ -240,7 +272,7 @@ pub fn spawn_entity
 
                     //3D空間での座標
                     let grid = IVec2::new( x, y );
-                    let vec3 = grid.convert_3d_space();
+                    let vec3 = grid.to_3dxz();
 
                     //壁
                     if map.is_wall( grid )
