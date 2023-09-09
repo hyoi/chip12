@@ -66,7 +66,8 @@ fn main()
                     misc::catch_input_gamepad,  //極座標を更新(ゲームパッド)
                 ),
 
-                #[cfg( debug_assertions )] //Updateで.run_ifよりover head少ない？
+                //Updateでは.run_if( misc::DEBUG )よりover head少ない？
+                // #[cfg( debug_assertions )]
                 misc::move_orbit_camera::<misc::AppDefault3dCamera>, //Camera操作テスト
             )
             .chain() //実行順の固定
