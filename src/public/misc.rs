@@ -240,17 +240,18 @@ pub fn move_orbit_camera<T: Component>
     mut cmds: Commands,
 )
 {   let Ok ( mut transform ) = q_camera.get_single_mut() else { return };
-    let orbit = if let Some ( camera ) = o_camera
-    {   camera.orbit
+    let camera = if let Some ( camera ) = o_camera
+    {   *camera
     }
     else
     {   cmds.init_resource::<OrbitCamera>(); //<OrbitCamera>が見つからない場合
-        OrbitCamera::default().orbit
+        OrbitCamera::default()
     };
 
     //カメラの位置と向きを更新する
-    let vec3 = orbit.convert_vec3();
-    *transform = Transform::from_translation( vec3 ).looking_at( Vec3::ZERO, Vec3::Y );
+    let vec3 = camera.orbit.convert_vec3();
+    let viewpoint = camera.look_at;
+    *transform = Transform::from_translation( vec3 ).looking_at( viewpoint, Vec3::Y );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

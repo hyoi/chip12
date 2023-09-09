@@ -58,7 +58,8 @@ impl Orbit
 //極座標カメラのResource
 #[derive( Resource, Clone, Copy )]
 pub struct OrbitCamera
-{   pub orbit: Orbit,
+{   pub orbit: Orbit,  //カメラ自身の極座標
+    pub look_at: Vec3, //カメラの注視点の直交座標
 }
 
 impl Default for OrbitCamera
@@ -68,7 +69,8 @@ impl Default for OrbitCamera
             {   r    : ORBIT_CAMERA_INIT_R,
                 theta: ORBIT_CAMERA_INIT_THETA,
                 phi  : ORBIT_CAMERA_INIT_PHI,
-            }
+            },
+            look_at: Vec3::ZERO,
         }
     }
 }
